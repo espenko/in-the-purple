@@ -1,0 +1,45 @@
+name: Daily Portal Update — 4pm CT
+
+on:
+  schedule:
+    # 4:00 PM Central Time = 21:00 UTC (CDT, Mar–Nov) / 22:00 UTC (CST, Nov–Mar)
+    # During Daylight Saving Time (portal season = Apr–May), use 21:00 UTC
+    - cron: '0 21 * * *'
+  workflow_dispatch: # allows manual trigger from GitHub Actions tab
+
+jobs:
+  update-portal-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # needed to commit updated data.json back to the repo
+
+    steps:
+
+      # ── Step 1: Check out the repo ──────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Step 2: Set up Python ───────────────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ── Step 3: Install dependencies ────────────────────────────────────────
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 anthropic python-dateutil
+
+      # ── Step 4: Run the scraper + AI summarizer ─────────────────────────────
+      - name: Scrape portal news and update data.json
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/update_portal.py
+
+      # ── Step 5: Commit the updated data.json ────────────────────────────────
+      - name: Commit updated data
+        run: |
+          git config user.name "In The Purple Bot"
+          git config user.email "bot@inthepurple.local"
+          git add data.json
+          git diff --staged --quiet || git commit -m "Portal update: $(TZ='America/Chicago' date +'%B %d, %Y at %I:%M %p CT')"
+          git push
