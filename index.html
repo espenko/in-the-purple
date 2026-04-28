@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>In The Purple — Northwestern MBB Portal Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --nu-purple: #4E2A84;
+      --nu-purple-dark: #3a1f63;
+      --nu-white: #FFFFFF;
+      --nu-black: #1a1a1a;
+      --nu-bg: #f4f2f8;
+      --nu-border: #d6cfe8;
+      --nu-gold: #B6A96A;
+      --c-confirmed: #1a7a3f;
+      --c-confirmed-bg: #d0f0de;
+      --c-visited: #4E2A84;
+      --c-visited-bg: #e8e0f7;
+      --c-offered: #1a4fa8;
+      --c-offered-bg: #d4e3f7;
+      --c-rumor: #b81c4b;
+      --c-rumor-bg: #fad4df;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Barlow', sans-serif; background: var(--nu-bg); color: var(--nu-black); }
+    .app { max-width: 960px; margin: 0 auto; padding-bottom: 2rem; }
+
+    /* ── Header ── */
+    .header-top-band { background: var(--nu-purple); padding: 1.2rem 1.5rem 1rem; }
+    .wordmark { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 800; color: var(--nu-white); letter-spacing: 1px; text-transform: uppercase; line-height: 1; }
+    .tagline { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: rgba(255,255,255,0.65); letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; font-weight: 600; }
+    .header-meta { text-align: right; }
+    .header-meta strong { color: var(--nu-white); font-size: 13px; display: block; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; }
+    .header-meta span { font-size: 11px; color: rgba(255,255,255,0.5); font-family: 'Barlow', sans-serif; }
+
+    /* ── Nav ── */
+    .nav-band { background: var(--nu-bg); border-bottom: 1px solid var(--nu-border); display: flex; padding: 0 4px; }
+    .nav-tab {
+      position: relative; padding: 13px 18px 12px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700;
+      color: var(--nu-purple); background: none; border: none; outline: none; box-shadow: none;
+      cursor: pointer; letter-spacing: 1.5px; text-transform: uppercase; transition: color 0.15s;
+      -webkit-appearance: none; appearance: none; display: inline-block; user-select: none;
+    }
+    .nav-tab::after {
+      content: ''; position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%) scaleX(0); width: 80%; height: 3px;
+      background: var(--nu-gold); border-radius: 2px 2px 0 0;
+      transition: transform 0.2s ease; transform-origin: center;
+    }
+    .nav-tab:hover { color: var(--nu-purple-dark); }
+    .nav-tab:hover::after { transform: translateX(-50%) scaleX(0.4); opacity: 0.6; }
+    .nav-tab:focus { outline: none; box-shadow: none; }
+    .nav-tab.active { color: var(--nu-purple-dark); }
+    .nav-tab.active::after { transform: translateX(-50%) scaleX(1); }
+
+    /* ── Content ── */
+    .content { padding: 1.5rem; }
+    .section { display: none; }
+    .section.active { display: block; padding-bottom: 2.5rem; }
+    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--nu-purple-dark); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+
+    /* ── Legend ── */
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: #555; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Status badges ── */
+    .status-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+    .s-confirmed { background: var(--c-confirmed-bg); color: var(--c-confirmed); }
+    .s-rumor     { background: var(--c-rumor-bg);     color: var(--c-rumor); }
+    .s-visited   { background: var(--c-visited-bg);   color: var(--c-visited); }
+    .s-offered   { background: var(--c-offered-bg);   color: var(--c-offered); }
+
+    /* ── Target Board ── */
+    .target-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 12px; }
+    .player-card { background: var(--nu-white); border-radius: 10px; border: 1px solid var(--nu-border); overflow: hidden; transition: transform 0.15s; }
+    .player-card:hover { transform: translateY(-2px); }
+    .card-header { background: var(--nu-purple); padding: 12px 14px 10px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .player-name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 800; color: var(--nu-white); letter-spacing: 0.5px; text-transform: uppercase; line-height: 1.1; }
+    .player-school { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 3px; }
+    .card-body { padding: 12px 14px; }
+    .card-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; }
+    .card-label { color: #888; font-size: 12px; }
+    .card-value { font-weight: 600; color: var(--nu-black); }
+    .looks-like { background: var(--nu-bg); border-radius: 6px; padding: 8px 10px; margin-top: 10px; border-left: 3px solid var(--nu-purple); }
+    .looks-like-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--nu-purple); font-weight: 700; margin-bottom: 2px; }
+    .looks-like-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--nu-black); }
+    .looks-like-sub { font-size: 11px; color: #777; margin-top: 1px; }
+    .source-line { font-size: 10px; color: #bbb; margin-top: 10px; border-top: 1px solid var(--nu-bg); padding-top: 8px; display: flex; justify-content: space-between; }
+
+    /* ── News Feed ── */
+    .feed { display: flex; flex-direction: column; gap: 10px; }
+    .feed-item { background: var(--nu-white); border-radius: 8px; border: 1px solid var(--nu-border); border-left-width: 4px; padding: 12px 14px; }
+    .feed-item.confirmed { border-left-color: var(--c-confirmed); }
+    .feed-item.rumor     { border-left-color: var(--c-rumor); }
+    .feed-item.visited   { border-left-color: var(--c-visited); }
+    .feed-item.offered   { border-left-color: var(--c-offered); }
+    .feed-title { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: var(--nu-black); line-height: 1.2; letter-spacing: 0.3px; }
+    .feed-sub { font-size: 12px; color: #777; margin-top: 3px; line-height: 1.5; }
+    .feed-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; display: inline-block; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ── Roster Needs ── */
+    .needs-legend { display: flex; gap: 14px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+    .needs-legend-item { display: flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #555; }
+    .needs-legend-bar { width: 18px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+    .needs-row-guards   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .needs-row-forwards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .needs-row-center   { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 1rem; max-width: 50%; }
+    .need-card { background: var(--nu-white); border-radius: 8px; border: 1px solid var(--nu-border); overflow: hidden; display: flex; flex-direction: column; }
+    .need-card.urgent   { border-top: 3px solid var(--c-rumor); }
+    .need-card.moderate { border-top: 3px solid var(--nu-gold); }
+    .need-card.filled   { border-top: 3px solid var(--c-confirmed); }
+    .need-main { padding: 14px 14px 10px; flex: 1; display: flex; flex-direction: column; }
+    .need-pos-block { margin-bottom: 8px; }
+    .need-pos { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 800; color: var(--nu-purple); letter-spacing: 1px; line-height: 1; display: block; }
+    .need-pos-full { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-top: 2px; }
+    .need-returning { font-size: 12px; color: #555; margin-bottom: 3px; }
+    .need-returning span { font-weight: 600; color: var(--nu-purple); }
+    .need-sub { font-size: 11px; color: #999; margin-bottom: 16px; flex: 1; }
+    .need-bar { height: 4px; border-radius: 2px; background: var(--nu-border); margin-bottom: 8px; overflow: hidden; }
+    .need-fill { height: 100%; border-radius: 2px; }
+    .need-status { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* ── Learn More ── */
+    .learn-more-btn {
+      width: 100%; padding: 8px 14px; background: var(--nu-bg); border: none;
+      border-top: 1px solid var(--nu-border); font-family: 'Barlow', sans-serif;
+      font-size: 12px; font-weight: 700; color: var(--nu-purple); cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.15s; -webkit-appearance: none; appearance: none; outline: none;
+    }
+    .learn-more-btn:hover { background: var(--c-visited-bg); }
+    .learn-more-btn .arrow { font-size: 10px; transition: transform 0.2s; display: inline-block; }
+    .learn-more-btn.open .arrow { transform: rotate(180deg); }
+    .learn-more-panel { display: none; padding: 14px; background: var(--nu-bg); border-top: 1px solid var(--nu-border); }
+    .learn-more-panel.open { display: block; }
+    .lm-section { margin-bottom: 14px; }
+    .lm-section:last-child { margin-bottom: 0; }
+    .lm-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--nu-purple); border-bottom: 1px solid var(--nu-border); padding-bottom: 4px; margin-bottom: 8px; }
+    .lm-entry { margin-bottom: 8px; }
+    .lm-entry:last-child { margin-bottom: 0; }
+    .lm-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #888; display: block; margin-bottom: 2px; }
+    .lm-value { font-size: 12px; color: var(--nu-black); line-height: 1.55; display: block; }
+
+    /* ── Lineup Builder ── */
+    .roster-tabs { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .roster-tab {
+      padding: 6px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer;
+      border-radius: 20px; border: 1.5px solid var(--nu-border); background: var(--nu-white);
+      color: #777; transition: all 0.15s; -webkit-appearance: none; appearance: none; outline: none;
+    }
+    .roster-tab.active { background: var(--nu-purple); color: var(--nu-white); border-color: var(--nu-purple); }
+    .roster-view { display: none; }
+    .roster-view.active { display: block; }
+    .roster-table { width: 100%; background: var(--nu-white); border-radius: 10px; border: 1px solid var(--nu-border); overflow: hidden; font-size: 13px; border-collapse: collapse; }
+    .roster-table th { background: var(--nu-purple); color: var(--nu-white); padding: 9px 12px; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+    .roster-table td { padding: 9px 12px; border-bottom: 1px solid var(--nu-bg); color: var(--nu-black); }
+    .roster-table tr:last-child td { border-bottom: none; }
+    .roster-table tr:hover td { background: var(--nu-bg); }
+    .pos-pill { display: inline-block; width: 30px; text-align: center; background: var(--nu-purple); color: var(--nu-white); border-radius: 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; padding: 2px 0; letter-spacing: 0.5px; }
+    .new-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; background: var(--c-confirmed-bg); color: var(--c-confirmed); border-radius: 3px; padding: 1px 5px; font-weight: 700; margin-left: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .ret-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; background: var(--c-visited-bg); color: var(--c-visited); border-radius: 3px; padding: 1px 5px; font-weight: 700; margin-left: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* ── Analysis cards ── */
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .analysis-card { background: var(--nu-white); border-radius: 8px; border: 1px solid var(--nu-border); overflow: hidden; }
+    .analysis-card-header { padding: 10px 14px 8px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--nu-border); }
+    .analysis-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; flex-shrink: 0; }
+    .icon-benefit { background: var(--c-confirmed-bg); color: var(--c-confirmed); }
+    .icon-consider { background: var(--c-rumor-bg); color: var(--c-rumor); }
+    .analysis-card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .title-benefit { color: var(--c-confirmed); }
+    .title-consider { color: var(--c-rumor); }
+    .analysis-card-body { padding: 10px 14px; }
+    .analysis-item { display: flex; gap: 8px; margin-bottom: 8px; font-size: 12px; line-height: 1.5; color: #444; }
+    .analysis-item:last-child { margin-bottom: 0; }
+    .analysis-bullet { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+    .bullet-benefit { background: var(--c-confirmed); }
+    .bullet-consider { background: var(--c-rumor); }
+    .verdict-band { margin-top: 12px; background: var(--nu-purple); border-radius: 8px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 12px; }
+    .verdict-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--nu-gold); white-space: nowrap; margin-top: 2px; }
+    .verdict-text { font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.6; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .needs-row-guards, .needs-row-forwards { grid-template-columns: 1fr; }
+      .needs-row-center { max-width: 100%; }
+      .analysis-grid { grid-template-columns: 1fr; }
+      .nav-tab { padding: 10px 12px; font-size: 12px; }
+      .wordmark { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header-top-band">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div class="wordmark">In The Purple</div>
+        <div class="tagline">Every move. Every rumor. All purple.</div>
+      </div>
+      <div class="header-meta">
+        <strong>2025 Men's Basketball Portal</strong>
+        <span id="last-updated">Updated April 27th</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-band">
+    <span class="nav-tab active" onclick="showSection('board',this)">Target Board</span>
+    <span class="nav-tab" onclick="showSection('feed',this)">News Feed</span>
+    <span class="nav-tab" onclick="showSection('needs',this)">Roster Needs</span>
+    <span class="nav-tab" onclick="showSection('rosters',this)">Lineup Builder</span>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════════
+         TARGET BOARD
+    ══════════════════════════════════ -->
+    <div class="section active" id="board">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+        <div class="section-title" style="margin-bottom:0;">Portal Targets</div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--c-confirmed)"></div>Confirmed</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--c-rumor)"></div>Rumor</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--c-offered)"></div>Offered</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--c-visited)"></div>Visited</div>
+        </div>
+      </div>
+      <div class="target-board" id="target-board-container">
+        <!-- Cards injected by data.js -->
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         NEWS FEED
+    ══════════════════════════════════ -->
+    <div class="section" id="feed">
+      <div class="section-title">Latest Portal News</div>
+      <div class="feed" id="feed-container">
+        <!-- Items injected by data.js -->
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         ROSTER NEEDS
+    ══════════════════════════════════ -->
+    <div class="section" id="needs">
+      <div class="section-title">Roster Needs by Position</div>
+      <div class="needs-legend">
+        <div class="needs-legend-item"><div class="needs-legend-bar" style="background:var(--c-rumor)"></div><span style="color:var(--c-rumor)">Urgent</span><span style="color:#888;font-weight:600"> — 0–1 returning</span></div>
+        <div class="needs-legend-item"><div class="needs-legend-bar" style="background:var(--nu-gold)"></div><span style="color:#9a7a00">Moderate</span><span style="color:#888;font-weight:600"> — 2 returning/added</span></div>
+        <div class="needs-legend-item"><div class="needs-legend-bar" style="background:var(--c-confirmed)"></div><span style="color:var(--c-confirmed)">Filled</span><span style="color:#888;font-weight:600"> — 3+ covered</span></div>
+      </div>
+
+      <div class="needs-row-guards">
+        <div class="need-card moderate">
+          <div class="need-main">
+            <div class="need-pos-block"><span class="need-pos">PG</span><span class="need-pos-full">Point Guard</span></div>
+            <div class="need-returning">Returning: <span>Jake West</span></div>
+            <div class="need-sub">+ LA Pratt (can play PG)</div>
+            <div class="need-bar"><div class="need-fill" style="width:60%;background:var(--nu-gold)"></div></div>
+            <div class="need-status" style="color:#9a7a00">Moderate</div>
+          </div>
+          <button class="learn-more-btn" onclick="toggleLearnMore(this)">Learn More <span class="arrow">▼</span></button>
+          <div class="learn-more-panel">
+            <div class="lm-section">
+              <div class="lm-section-title">Position</div>
+              <div class="lm-entry"><span class="lm-label">Role</span><span class="lm-value">Ball-handler, pace-setter, primary passer</span></div>
+              <div class="lm-entry"><span class="lm-label">Typical Stats</span><span class="lm-value">5+ APG, 15+ PPG at high level</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Why Moderate</div>
+              <div class="lm-entry"><span class="lm-label">Returning</span><span class="lm-value">Jake West — multi-year starter with system familiarity</span></div>
+              <div class="lm-entry"><span class="lm-label">Added</span><span class="lm-value">LA Pratt can shift to PG; averaged 3.3 APG last healthy season</span></div>
+              <div class="lm-entry"><span class="lm-label">Gap</span><span class="lm-value">Pratt health uncertain after season-ending broken foot. No proven backup PG if West goes down.</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Logic</div>
+              <div class="lm-entry"><span class="lm-label">Rule</span><span class="lm-value">Moderate = 1–2 players covering the spot with at least one proven starter returning</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="need-card urgent">
+          <div class="need-main">
+            <div class="need-pos-block"><span class="need-pos">SG</span><span class="need-pos-full">Shooting Guard</span></div>
+            <div class="need-returning">Returning: <span>Ciaravino, Gill</span></div>
+            <div class="need-sub">Fiegen visit — decision pending</div>
+            <div class="need-bar"><div class="need-fill" style="width:40%;background:var(--c-rumor)"></div></div>
+            <div class="need-status" style="color:var(--c-rumor)">Urgent</div>
+          </div>
+          <button class="learn-more-btn" onclick="toggleLearnMore(this)">Learn More <span class="arrow">▼</span></button>
+          <div class="learn-more-panel">
+            <div class="lm-section">
+              <div class="lm-section-title">Position</div>
+              <div class="lm-entry"><span class="lm-label">Role</span><span class="lm-value">Perimeter scorer, off-ball movement, 3-point threat</span></div>
+              <div class="lm-entry"><span class="lm-label">Typical Stats</span><span class="lm-value">15+ PPG, 35%+ from three</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Why Urgent</div>
+              <div class="lm-entry"><span class="lm-label">Returning</span><span class="lm-value">Ciaravino (defense-first) and Gill (two-way) — neither is a primary perimeter scorer</span></div>
+              <div class="lm-entry"><span class="lm-label">Departed</span><span class="lm-value">Jayden Reid (leading scorer) to Providence, Clayton to UMass, Green to portal</span></div>
+              <div class="lm-entry"><span class="lm-label">Gap</span><span class="lm-value">No proven 15+ PPG guard threat. Backcourt lacks a scoring identity at the two.</span></div>
+              <div class="lm-entry"><span class="lm-label">Target</span><span class="lm-value">Jake Fiegen (Cornell, 17.1 PPG, 54.6% FG) — choosing between NU, Vanderbilt, Villanova, Virginia.</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Logic</div>
+              <div class="lm-entry"><span class="lm-label">Rule</span><span class="lm-value">Urgent = returning players don't cover the primary scoring need at this position</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="needs-row-forwards">
+        <div class="need-card filled">
+          <div class="need-main">
+            <div class="need-pos-block"><span class="need-pos">SF</span><span class="need-pos-full">Small Forward</span></div>
+            <div class="need-returning">Added: <span>Karasinski</span></div>
+            <div class="need-sub">Kostić provides wing depth</div>
+            <div class="need-bar"><div class="need-fill" style="width:85%;background:var(--c-confirmed)"></div></div>
+            <div class="need-status" style="color:var(--c-confirmed)">Filled</div>
+          </div>
+          <button class="learn-more-btn" onclick="toggleLearnMore(this)">Learn More <span class="arrow">▼</span></button>
+          <div class="learn-more-panel">
+            <div class="lm-section">
+              <div class="lm-section-title">Position</div>
+              <div class="lm-entry"><span class="lm-label">Role</span><span class="lm-value">Versatile wing — scores, rebounds, defends multiple positions</span></div>
+              <div class="lm-entry"><span class="lm-label">Typical Stats</span><span class="lm-value">12–18 PPG, 4–6 RPG</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Why Filled</div>
+              <div class="lm-entry"><span class="lm-label">Added</span><span class="lm-value">Jack Karasinski — 21.7 PPG, 42% from three. Immediately NU's leading scorer.</span></div>
+              <div class="lm-entry"><span class="lm-label">Depth</span><span class="lm-value">Aleksej Kostić (BYU) — 6'4" wing with shooting, 3 years eligibility remaining.</span></div>
+              <div class="lm-entry"><span class="lm-label">Departed</span><span class="lm-value">Tre Singleton (portal) and Tyler Kropp (Washington State) — both unproven freshmen.</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Logic</div>
+              <div class="lm-entry"><span class="lm-label">Rule</span><span class="lm-value">Filled = starter-caliber player added with at least one depth option</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="need-card filled">
+          <div class="need-main">
+            <div class="need-pos-block"><span class="need-pos">PF</span><span class="need-pos-full">Power Forward</span></div>
+            <div class="need-returning">Added: <span>Colin Smith</span></div>
+            <div class="need-sub">Federiko (Drake) also added 6'9"</div>
+            <div class="need-bar"><div class="need-fill" style="width:80%;background:var(--c-confirmed)"></div></div>
+            <div class="need-status" style="color:var(--c-confirmed)">Filled</div>
+          </div>
+          <button class="learn-more-btn" onclick="toggleLearnMore(this)">Learn More <span class="arrow">▼</span></button>
+          <div class="learn-more-panel">
+            <div class="lm-section">
+              <div class="lm-section-title">Position</div>
+              <div class="lm-entry"><span class="lm-label">Role</span><span class="lm-value">Interior scorer, rebounder, stretch threat in modern lineups</span></div>
+              <div class="lm-entry"><span class="lm-label">Typical Stats</span><span class="lm-value">10–14 PPG, 6–8 RPG</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Why Filled</div>
+              <div class="lm-entry"><span class="lm-label">Added</span><span class="lm-value">Colin Smith (UCSB) — 11.9 PPG, 41% from three. Floor-stretching big with grad transfer experience.</span></div>
+              <div class="lm-entry"><span class="lm-label">Depth</span><span class="lm-value">Okku Federiko (Drake) — 6'9" Finnish forward who started all 34 games last season.</span></div>
+              <div class="lm-entry"><span class="lm-label">Departed</span><span class="lm-value">Arrinten Page transferred. Tyler Kropp committed to Washington State.</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Logic</div>
+              <div class="lm-entry"><span class="lm-label">Rule</span><span class="lm-value">Filled = two capable players added — a starter and a proven depth option</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="needs-row-center">
+        <div class="need-card filled">
+          <div class="need-main">
+            <div class="need-pos-block"><span class="need-pos">C</span><span class="need-pos-full">Center</span></div>
+            <div class="need-returning">Added: <span>Luke McEldon</span></div>
+            <div class="need-sub">6'10", 64.5% FG last season</div>
+            <div class="need-bar"><div class="need-fill" style="width:80%;background:var(--c-confirmed)"></div></div>
+            <div class="need-status" style="color:var(--c-confirmed)">Filled</div>
+          </div>
+          <button class="learn-more-btn" onclick="toggleLearnMore(this)">Learn More <span class="arrow">▼</span></button>
+          <div class="learn-more-panel">
+            <div class="lm-section">
+              <div class="lm-section-title">Position</div>
+              <div class="lm-entry"><span class="lm-label">Role</span><span class="lm-value">Anchor the paint — rim protection, rebounding, interior scoring</span></div>
+              <div class="lm-entry"><span class="lm-label">Typical Stats</span><span class="lm-value">8–12 PPG, 7–10 RPG, 1.5+ BPG</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Why Filled</div>
+              <div class="lm-entry"><span class="lm-label">Added</span><span class="lm-value">Luke McEldon — 6'10", 255 lbs, 11.7 PPG, 6.2 RPG on 64.5% FG. Best game: 25 pts on 11-of-12 vs. Niagara.</span></div>
+              <div class="lm-entry"><span class="lm-label">Departed</span><span class="lm-value">Arrinten Page (10.2 PPG, 4.5 RPG, 1.2 BPG) transferred. Cade Bannerman (redshirt) also left.</span></div>
+              <div class="lm-entry"><span class="lm-label">Watch</span><span class="lm-value">NU may still target one more big. Depth behind McEldon is thin if that falls through.</span></div>
+            </div>
+            <div class="lm-section">
+              <div class="lm-section-title">Logic</div>
+              <div class="lm-entry"><span class="lm-label">Rule</span><span class="lm-value">Filled = proven starter added. Could downgrade to Moderate if no backup center is secured.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         LINEUP BUILDER
+    ══════════════════════════════════ -->
+    <div class="section" id="rosters">
+      <div class="section-title">Starting Lineup Scenarios</div>
+      <div class="roster-tabs">
+        <button class="roster-tab active" onclick="showRoster('opt1',this)">Current Commits</button>
+        <button class="roster-tab" onclick="showRoster('opt2',this)">Add Fiegen</button>
+        <button class="roster-tab" onclick="showRoster('opt3',this)">Pratt Starts</button>
+      </div>
+
+      <!-- Scenario A -->
+      <div class="roster-view active" id="opt1">
+        <table class="roster-table">
+          <tr><th>Pos</th><th>Player</th><th>Status</th><th>PPG</th><th>Notes</th></tr>
+          <tr><td><span class="pos-pill">PG</span></td><td>Jake West <span class="ret-tag">Returns</span></td><td style="color:var(--c-visited);font-weight:600">Returning</td><td>—</td><td>Lead PG, multi-year starter</td></tr>
+          <tr><td><span class="pos-pill">SG</span></td><td>Angelo Ciaravino <span class="ret-tag">Returns</span></td><td style="color:var(--c-visited);font-weight:600">Returning</td><td>—</td><td>Defensive centerpiece</td></tr>
+          <tr><td><span class="pos-pill">SF</span></td><td>Jack Karasinski <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>21.7</td><td>Bellarmine — new go-to scorer</td></tr>
+          <tr><td><span class="pos-pill">PF</span></td><td>Colin Smith <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>11.9</td><td>UCSB — 41% from three</td></tr>
+          <tr><td><span class="pos-pill">C</span></td><td>Luke McEldon <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>11.7</td><td>Mount St. Mary's — 64.5% FG</td></tr>
+        </table>
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="analysis-card-header"><div class="analysis-icon icon-benefit">+</div><div class="analysis-card-title title-benefit">Benefits</div></div>
+            <div class="analysis-card-body">
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Karasinski steps in as an immediate go-to scorer — 21.7 PPG fills the Martinelli-sized hole right away</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Smith and McEldon give NU a frontcourt with real size and shooting — Smith's 41% from three stretches the floor alongside McEldon's paint dominance</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>West anchors a returning backcourt — familiar system, no learning curve at the point</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>High floor — most likely scenario, roster is functional and veteran-heavy</div>
+            </div>
+          </div>
+          <div class="analysis-card">
+            <div class="analysis-card-header"><div class="analysis-icon icon-consider">!</div><div class="analysis-card-title title-consider">Considerations</div></div>
+            <div class="analysis-card-body">
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Ciaravino at SG is a defensive match — but NU needs someone who can create off the dribble next to West</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>No true second scorer in the backcourt — if Karasinski is defended hard, options shrink fast</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Bench depth is thin — Kostić and Gill are primary reserves; one injury could expose the rotation</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Competition level jump — Karasinski and McEldon come from mid-majors; Big Ten physicality is a real question</div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-band">
+          <div class="verdict-label">Verdict</div>
+          <div class="verdict-text">A functional, veteran lineup that can compete in the Big Ten — but its ceiling depends on Karasinski translating his mid-major dominance. Adding one more perimeter scorer would unlock this roster.</div>
+        </div>
+      </div>
+
+      <!-- Scenario B -->
+      <div class="roster-view" id="opt2">
+        <table class="roster-table">
+          <tr><th>Pos</th><th>Player</th><th>Status</th><th>PPG</th><th>Notes</th></tr>
+          <tr><td><span class="pos-pill">PG</span></td><td>Jake West <span class="ret-tag">Returns</span></td><td style="color:var(--c-visited);font-weight:600">Returning</td><td>—</td><td>Lead PG, multi-year starter</td></tr>
+          <tr><td><span class="pos-pill">SG</span></td><td>Jake Fiegen <span class="new-tag">Target</span></td><td style="color:var(--c-visited);font-weight:600">Visited</td><td>17.1</td><td>Cornell — local kid, elite shooter</td></tr>
+          <tr><td><span class="pos-pill">SF</span></td><td>Jack Karasinski <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>21.7</td><td>Bellarmine — new go-to scorer</td></tr>
+          <tr><td><span class="pos-pill">PF</span></td><td>Colin Smith <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>11.9</td><td>UCSB — 41% from three</td></tr>
+          <tr><td><span class="pos-pill">C</span></td><td>Luke McEldon <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>11.7</td><td>Mount St. Mary's — 64.5% FG</td></tr>
+        </table>
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="analysis-card-header"><div class="analysis-icon icon-benefit">+</div><div class="analysis-card-title title-benefit">Benefits</div></div>
+            <div class="analysis-card-body">
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Four players who scored 11+ PPG last season — unprecedented scoring depth for NU in the portal era</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Fiegen fills the one glaring gap — 17.1 PPG on 54.6% shooting with multiple years of eligibility</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Wilmette native already familiar with Evanston — hometown connection reduces adjustment risk</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Elite floor spacing — Smith, Karasinski, and Fiegen all shoot 40%+ from three</div>
+            </div>
+          </div>
+          <div class="analysis-card">
+            <div class="analysis-card-header"><div class="analysis-icon icon-consider">!</div><div class="analysis-card-title title-consider">Considerations</div></div>
+            <div class="analysis-card-body">
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Fiegen is choosing between four programs — Vanderbilt and Virginia also have strong pitches; far from done</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Cornell to Big Ten is a major jump — his 54.6% FG was in the Ivy League, not against Big Ten defenders</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Roster could skew guard-heavy — if Smith or McEldon underperform, frontcourt depth becomes a problem</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>No true switch defender or point forward — tough matchups could expose this in the Big Ten</div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-band">
+          <div class="verdict-label">Verdict</div>
+          <div class="verdict-text">The best-case scenario — and a legitimately exciting one. If Fiegen commits, NU has one of the more interesting mid-tier rosters in the Big Ten. This lineup could push for the upper half of the conference if the mid-major transfers translate.</div>
+        </div>
+      </div>
+
+      <!-- Scenario C -->
+      <div class="roster-view" id="opt3">
+        <table class="roster-table">
+          <tr><th>Pos</th><th>Player</th><th>Status</th><th>PPG</th><th>Notes</th></tr>
+          <tr><td><span class="pos-pill">PG</span></td><td>LA Pratt <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>11.2</td><td>Northeastern — returns from foot injury</td></tr>
+          <tr><td><span class="pos-pill">SG</span></td><td>Angelo Ciaravino <span class="ret-tag">Returns</span></td><td style="color:var(--c-visited);font-weight:600">Returning</td><td>—</td><td>Defense-first, veteran presence</td></tr>
+          <tr><td><span class="pos-pill">SF</span></td><td>Jack Karasinski <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>21.7</td><td>Bellarmine — new go-to scorer</td></tr>
+          <tr><td><span class="pos-pill">PF</span></td><td>Colin Smith <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>11.9</td><td>UCSB — 41% from three</td></tr>
+          <tr><td><span class="pos-pill">C</span></td><td>Luke McEldon <span class="new-tag">New</span></td><td style="color:var(--c-confirmed);font-weight:600">Committed</td><td>11.7</td><td>Mount St. Mary's — 64.5% FG</td></tr>
+        </table>
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="analysis-card-header"><div class="analysis-icon icon-benefit">+</div><div class="analysis-card-title title-benefit">Benefits</div></div>
+            <div class="analysis-card-body">
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Pratt as starter adds scoring punch — 17 PPG in three games before injury signals elite upside when healthy</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Frees West as a versatile sixth man — an experienced PG off the bench is a luxury most Big Ten teams don't have</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Longer lineup at guard — Pratt at 6'5" creates favorable matchups against smaller PGs</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-benefit"></div>Ciaravino keeps his defensive anchor role — system doesn't need major changes for this to work</div>
+            </div>
+          </div>
+          <div class="analysis-card">
+            <div class="analysis-card-header"><div class="analysis-icon icon-consider">!</div><div class="analysis-card-title title-consider">Considerations</div></div>
+            <div class="analysis-card-body">
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Pratt played just three games in 2025-26 — a season-ending broken foot introduces real health uncertainty</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>If Pratt isn't 100%, NU loses their starting PG and the West depth advantage disappears simultaneously</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Ciaravino at SG still leaves a perimeter scoring gap — doesn't solve the problem without Fiegen</div>
+              <div class="analysis-item"><div class="analysis-bullet bullet-consider"></div>Highest variance scenario — unlocks the roster or makes it more fragile than the current commits lineup</div>
+            </div>
+          </div>
+        </div>
+        <div class="verdict-band">
+          <div class="verdict-label">Verdict</div>
+          <div class="verdict-text">High risk, high reward. If Pratt is fully healthy, this might actually be the most dynamic lineup of the three — a 6'5" scoring PG alongside Karasinski changes what defenses have to account for. But the injury question is real and NU can't afford to find out mid-season.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<script>
+  /* ── Navigation ── */
+  function showSection(id, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  function showRoster(id, el) {
+    document.querySelectorAll('.roster-view').forEach(r => r.classList.remove('active'));
+    document.querySelectorAll('.roster-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  function toggleLearnMore(btn) {
+    const panel = btn.nextElementSibling;
+    const isOpen = panel.classList.contains('open');
+    panel.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+  }
+
+  /* ── Dynamic data loading ── */
+  // Load data.json and render target board + news feed dynamically.
+  // This allows the GitHub Action to update data.json daily without touching index.html.
+
+  const STATUS_CLASSES = {
+    confirmed: 's-confirmed',
+    rumor: 's-rumor',
+    visited: 's-visited',
+    offered: 's-offered'
+  };
+
+  const STATUS_LABELS = {
+    confirmed: 'Committed',
+    rumor: 'Rumor',
+    visited: 'Visited',
+    offered: 'Offered'
+  };
+
+  async function loadData() {
+    try {
+      const res = await fetch('data.json?t=' + Date.now());
+      if (!res.ok) throw new Error('No data file');
+      const data = await res.json();
+
+      if (data.lastUpdated) {
+        document.getElementById('last-updated').textContent = 'Updated ' + data.lastUpdated;
+      }
+
+      renderTargetBoard(data.players || []);
+      renderFeed(data.news || []);
+    } catch (e) {
+      // data.json not present — static HTML content already visible, nothing to do
+      console.log('Running in static mode (no data.json found)');
+    }
+  }
+
+  function renderTargetBoard(players) {
+    if (!players.length) return;
+    const container = document.getElementById('target-board-container');
+    container.innerHTML = players.map(p => `
+      <div class="player-card">
+        <div class="card-header">
+          <div>
+            <div class="player-name">${p.name}</div>
+            <div class="player-school">${p.school} · ${p.height} ${p.position}</div>
+          </div>
+          <span class="status-badge ${STATUS_CLASSES[p.status] || 's-rumor'}">${STATUS_LABELS[p.status] || p.status}</span>
+        </div>
+        <div class="card-body">
+          ${p.stats.map(s => `<div class="card-row"><span class="card-label">${s.label}</span><span class="card-value">${s.value}</span></div>`).join('')}
+          <div class="card-row"><span class="card-label">Eligibility</span><span class="card-value">${p.eligibility}</span></div>
+          <div class="looks-like">
+            <div class="looks-like-label">Looks Like</div>
+            <div class="looks-like-name">${p.looksLikeName}</div>
+            <div class="looks-like-sub">${p.looksLikeSub}</div>
+          </div>
+          <div class="source-line"><span>${p.sources}</span><span>${p.date}</span></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderFeed(news) {
+    if (!news.length) return;
+    const container = document.getElementById('feed-container');
+    container.innerHTML = news.map(n => `
+      <div class="feed-item ${n.status}">
+        <div class="feed-title">${n.title}</div>
+        <div class="feed-sub">${n.source} · ${n.date} — ${n.body}</div>
+        <span class="feed-badge ${STATUS_CLASSES[n.status] || 's-rumor'}">${STATUS_LABELS[n.status] || n.status}</span>
+      </div>
+    `).join('');
+  }
+
+  loadData();
+</script>
+</body>
+</html>

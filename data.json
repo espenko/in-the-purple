@@ -1,0 +1,151 @@
+{
+  "lastUpdated": "April 27th",
+  "players": [
+    {
+      "name": "Jack Karasinski",
+      "school": "Bellarmine",
+      "height": "6'7\"",
+      "position": "SF/F",
+      "status": "confirmed",
+      "eligibility": "1 yr left",
+      "stats": [
+        { "label": "PPG", "value": "21.7" },
+        { "label": "RPG", "value": "4.7" },
+        { "label": "3PT%", "value": "42.0%" }
+      ],
+      "looksLikeName": "Pete Nance '23",
+      "looksLikeSub": "Stretch forward, elite scorer, floor spacer",
+      "sources": "Inside NU · On3",
+      "date": "Apr 14"
+    },
+    {
+      "name": "Luke McEldon",
+      "school": "Mount St. Mary's",
+      "height": "6'10\"",
+      "position": "C/F",
+      "status": "confirmed",
+      "eligibility": "Multi-yr",
+      "stats": [
+        { "label": "PPG", "value": "11.7" },
+        { "label": "RPG", "value": "6.2" },
+        { "label": "FG%", "value": "64.5%" }
+      ],
+      "looksLikeName": "Dererk Pardon '19",
+      "looksLikeSub": "High-efficiency rim-running big",
+      "sources": "Inside NU · 247Sports",
+      "date": "Apr 15"
+    },
+    {
+      "name": "Colin Smith",
+      "school": "UC Santa Barbara",
+      "height": "6'8\"",
+      "position": "PF",
+      "status": "confirmed",
+      "eligibility": "1 yr left",
+      "stats": [
+        { "label": "PPG", "value": "11.9" },
+        { "label": "RPG", "value": "4.2" },
+        { "label": "3PT%", "value": "41.0%" }
+      ],
+      "looksLikeName": "A.J. Turner '22",
+      "looksLikeSub": "Veteran stretch big, reliable 3-pt threat",
+      "sources": "Inside NU · On3",
+      "date": "Apr 17"
+    },
+    {
+      "name": "LA Pratt",
+      "school": "Northeastern",
+      "height": "6'5\"",
+      "position": "G",
+      "status": "confirmed",
+      "eligibility": "1 yr left",
+      "stats": [
+        { "label": "PPG", "value": "11.2" },
+        { "label": "APG", "value": "3.3" },
+        { "label": "FG%", "value": "47.5%" }
+      ],
+      "looksLikeName": "Ty Berry '24",
+      "looksLikeSub": "Scoring guard, proven starter, shot-maker",
+      "sources": "Inside NU · On3",
+      "date": "Apr 17"
+    },
+    {
+      "name": "Jake Fiegen",
+      "school": "Cornell",
+      "height": "6'4\"",
+      "position": "SG",
+      "status": "visited",
+      "eligibility": "Multi-yr",
+      "stats": [
+        { "label": "PPG", "value": "17.1" },
+        { "label": "FG%", "value": "54.6%" },
+        { "label": "Hometown", "value": "Wilmette, IL" }
+      ],
+      "looksLikeName": "Bryant McIntosh '17",
+      "looksLikeSub": "Efficient scorer, local kid, high IQ guard",
+      "sources": "Inside NU · Wildcat Report",
+      "date": "Apr 13"
+    },
+    {
+      "name": "Aleksej Kostić",
+      "school": "BYU",
+      "height": "6'4\"",
+      "position": "G",
+      "status": "confirmed",
+      "eligibility": "3 yrs left",
+      "stats": [
+        { "label": "PPG", "value": "4.4" },
+        { "label": "3PT%", "value": "37.0%" },
+        { "label": "Origin", "value": "Austria" }
+      ],
+      "looksLikeName": "Ryan Greer '21",
+      "looksLikeSub": "International G, 3-pt specialist, upside pick",
+      "sources": "DraftExpress · On3",
+      "date": "Apr 24"
+    }
+  ],
+  "news": [
+    {
+      "title": "Aleksej Kostić (BYU) commits to Northwestern",
+      "status": "confirmed",
+      "source": "DraftExpress",
+      "date": "Apr 24",
+      "body": "The 6'4\" Austrian guard averaged 37% from three at BYU. Adds international depth and shooting to the backcourt."
+    },
+    {
+      "title": "LA Pratt commits — returns from broken foot to join 'Cats",
+      "status": "confirmed",
+      "source": "Inside NU",
+      "date": "Apr 17",
+      "body": "The Northeastern guard averaged 17 PPG in three games before injury. Joins Ciaravino, West and Gill in the backcourt."
+    },
+    {
+      "title": "Colin Smith (UCSB) commits as graduate transfer",
+      "status": "confirmed",
+      "source": "Inside NU",
+      "date": "Apr 17",
+      "body": "Lights-out shooter who hit 41% from three last season. Fills the frontcourt hole left by Martinelli's departure."
+    },
+    {
+      "title": "Jake Fiegen takes visit — Wildcats among his final four",
+      "status": "visited",
+      "source": "Wildcat Report",
+      "date": "Apr 13",
+      "body": "The Cornell sharpshooter and Wilmette native has NU alongside Vanderbilt, Villanova and Virginia."
+    },
+    {
+      "title": "Luke McEldon (Mount St. Mary's) commits to Northwestern",
+      "status": "confirmed",
+      "source": "Inside NU",
+      "date": "Apr 15",
+      "body": "The 6'10\" big averaged 11.7 PPG and 6.2 RPG on 64.5% shooting. NU's first big man addition this cycle."
+    },
+    {
+      "title": "Jack Karasinski (Bellarmine) is NU's first portal commit",
+      "status": "confirmed",
+      "source": "On3",
+      "date": "Apr 14",
+      "body": "The 6'7\" grad transfer averaged 21.7 PPG and 42% from three. Replaces Martinelli as go-to scorer."
+    }
+  ]
+}
